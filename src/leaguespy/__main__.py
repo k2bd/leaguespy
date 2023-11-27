@@ -36,7 +36,7 @@ PLAYERS_ARGUMENT = typer.Argument(
 
 def parse_regions(regions_str: str) -> list[str]:
     regions = (
-        [r.strip() for r in regions_str.split(",")]
+        [r.strip().lower() for r in regions_str.split(",")]
         if regions_str
         else [
             ASGARNIA,

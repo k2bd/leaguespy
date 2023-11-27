@@ -2,6 +2,8 @@
 
 This package can be used to compare OSRS leagues accounts on an individual task level.
 
+It takes a little bit to run while it emulates opening a browser to grab league progress.
+
 
 ## Installation
 
@@ -18,18 +20,22 @@ See available commands with:
 leaguespy --help
 ```
 
-### Listing completed tasks
+Commands have some shared optional arguments:
+- `--regions`: A comma-separated list of unlockable regions to include. Defaults to all regions. You can type full names, or common single-letter abbreviations (e.g. 'a' for Asgarnia, 'z' for Zeah, ...)
+- `--exclude-global`: Exclude global tasks and tasks from Misthalin and Karamja
+
+### Listing mutually completed tasks
 
 This will list all tasks any of the given players have done
 
 ```bash
-leaguespy tasks [--regions asgarnia,morytania] [--exclude-global] player1 player2 [...]
+leaguespy tasks [--regions [...]] [--exclude-global] player1 player2 [...]
 ```
 
 ### Suggesting tasks
 
-This will list any tasks you haven't done and that any of your friends have done. Put yourself first in the player list.
+This will list any tasks you haven't done and that any of your friends have done. Put yourself first in the list.
 
 ```bash
-leaguespy suggest [--regions asgarnia,morytania] [--exclude-global] player1 player2 [...]
+leaguespy suggest [--regions [...]] [--exclude-global] player1 player2 [...]
 ```
