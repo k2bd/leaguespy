@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "leaguespy"
+version = "0.1.0"
+description = "Compare OSRS leagues tasks between players"
+authors = ["Kevin Duff <kevinkelduff@gmail.com>"]
+readme = "README.md"
+packages = [{include = "leaguespy", from = "src"}]
+
+[tool.poetry.scripts]
+leaguespy = "leaguespy.__main__:app"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pandas = "^2.1.3"
+requests = "^2.31.0"
+beautifulsoup4 = "^4.12.2"
+selenium = "^4.15.2"
+webdriver-manager = "^4.0.1"
+typer = "^0.9.0"
+rich = "^13.7.0"
+tabulate = "^0.9.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.11.0"
+isort = "^5.12.0"
+flake8 = "^6.1.0"
+pyright = "^1.1.337"
+poethepoet = "^0.24.4"
+
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.poe.tasks]
+autoformat.sequence = [
+    {cmd = "black src"},
+    {cmd = "isort src"},
+]
+
+lint.sequence = [
+    {cmd = "black --check -v src"},
+    {cmd = "isort --check -v src"},
+    {cmd = "flake8 src"},
+    {cmd = "pyright src"},
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
