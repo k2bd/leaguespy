@@ -6,7 +6,7 @@ This package can be used to compare OSRS leagues accounts on an individual task 
 ## Installation
 
 ```bash
-pip install leaguespy
+pip install git+https://github.com/k2bd/leaguespy
 ```
 
 
