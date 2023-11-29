@@ -24,18 +24,18 @@ Commands have some shared optional arguments:
 - `--regions`: A comma-separated list of unlockable regions to include. Defaults to all regions. You can type full names, or common single-letter abbreviations (e.g. 'a' for Asgarnia, 'z' for Zeah, ...)
 - `--exclude-global`: Exclude global tasks and tasks from Misthalin and Karamja
 
-### Listing mutually completed tasks
-
-This will list all tasks any of the given players have done
-
-```bash
-leaguespy tasks [--regions [...]] [--exclude-global] player1 player2 [...]
-```
-
 ### Suggesting tasks
 
 This will list any tasks you haven't done and that any of your friends have done. Put yourself first in the list.
 
 ```bash
 leaguespy suggest [--regions [...]] [--exclude-global] player1 player2 [...]
+```
+
+### Listing tasks completed by a group
+
+This will list all tasks any of the given players have done
+
+```bash
+leaguespy tasks [--regions [...]] [--exclude-global] player1 player2 [...]
 ```
