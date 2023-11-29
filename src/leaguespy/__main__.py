@@ -15,7 +15,7 @@ MORYTANIA = "morytania"
 TIRANNWN = "tirannwn"
 WILDERNESS = "wilderness"
 KOUREND = "kourend"
-GLOBAL = "global"
+GENERAL = "general"
 KARAMJA = "karamja"
 MISTHALIN = "misthalin"
 
@@ -26,7 +26,7 @@ REGIONS_OPTION = typer.Option(
     "wilderness, kourend",
 )
 EXCLUDE_GLOBAL_OPTION = typer.Option(
-    False, help="Exclude global and shared-region tasks from the report"
+    False, help="Exclude general and shared-region tasks from the report"
 )
 PLAYERS_ARGUMENT = typer.Argument(
     ...,
@@ -85,7 +85,7 @@ def get_tasks_df(
     selected_regions = parse_regions(regions_str)
 
     if not exclude_global:
-        selected_regions.extend([GLOBAL, MISTHALIN, KARAMJA])
+        selected_regions.extend([GENERAL, MISTHALIN, KARAMJA])
 
     players_stats: dict[str, dict[int, PlayerTaskInfo]] = {}
 
@@ -121,6 +121,9 @@ def tasks(
     exclude_global: bool = EXCLUDE_GLOBAL_OPTION,
     players: list[str] = PLAYERS_ARGUMENT,
 ):
+    if len(players) == 0:
+        raise ValueError("Must specify at least one player")
+
     tasks_df = get_tasks_df(regions, exclude_global, players)
     tasks_to_report = tasks_df[tasks_df[players].any(axis=1)]
     print(tabulate(tasks_to_report, headers="keys", showindex=False))
@@ -132,6 +135,9 @@ def suggest(
     exclude_global: bool = EXCLUDE_GLOBAL_OPTION,
     players: list[str] = PLAYERS_ARGUMENT,
 ):
+    if len(players) < 2:
+        raise ValueError("Must specify at least two players")
+
     tasks_df = get_tasks_df(regions, exclude_global, players)
     main_player = players[0]
     any_tasks_done = tasks_df[tasks_df[players].any(axis=1)]
