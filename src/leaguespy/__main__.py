@@ -1,3 +1,4 @@
+#imports
 import pandas as pd
 import typer
 from tabulate import tabulate
@@ -11,6 +12,7 @@ app = typer.Typer(
     help="OSRS Leagues Comparison Tool",
     add_completion=False)
 
+# define constants
 ASGARNIA = "asgarnia"
 DESERT = "desert"
 FREMENNIK = "fremennik"
@@ -38,6 +40,7 @@ PLAYERS_ARGUMENT = typer.Argument(
 )
 
 
+# define functions
 def parse_regions(regions_str: str) -> list[str]:
     regions = (
         [r.strip().lower() for r in regions_str.split(",")]
@@ -118,6 +121,7 @@ def get_tasks_df(
 
     return pd.DataFrame.from_records(records)
 
+# define typer commands
 
 @app.command()
 def tasks(
