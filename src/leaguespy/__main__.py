@@ -123,13 +123,13 @@ def parse_columns(columns_str: str) -> list[str]:
 
     return list(results)
 
-# Get tasks dataframe
 def get_tasks_df(
     regions_str: str,
     columns_str: str,
     exclude_global: bool,
     players: list[str],
 ):
+    """Get a players tasks and returns a dataframe with the results"""
     if len(players) == 0:
         raise ValueError("Must specify at least one player")
 
