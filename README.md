@@ -4,15 +4,23 @@ This package can be used to compare OSRS leagues accounts on an individual task 
 
 It takes a little bit to run while it emulates opening a browser to grab league progress.
 
+## Requirements
+
+- Windows, macOS or Linux machine
+- [Python 3.x](https://www.python.org/downloads/)
+- [pip](https://pip.pypa.io/en/stable/installation/)
 
 ## Installation
 
 ```bash
-pip install git+https://github.com/k2bd/leaguespy
+pip install "git+https://github.com/k2bd/leaguespy"
 ```
 
 
 ## Usage
+
+> [!NOTE]
+> If you are on a Windows PC, you will have to navigate to the pip installation folder to run leaguespy. This can be found using `pip list -v`.
 
 See available commands with:
 
