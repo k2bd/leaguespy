@@ -1,12 +1,18 @@
+#imports
 import pandas as pd
 import typer
 from tabulate import tabulate
 
 from leaguespy.player_stats import get_player_stats
 from leaguespy.player_task_info import PlayerTaskInfo
+from typing_extensions import Annotated
 
-app = typer.Typer()
+# define typer app
+app = typer.Typer(
+    help="OSRS Leagues Comparison Tool",
+    add_completion=False)
 
+# define constants
 ASGARNIA = "asgarnia"
 DESERT = "desert"
 FREMENNIK = "fremennik"
@@ -19,21 +25,31 @@ GENERAL = "general"
 KARAMJA = "karamja"
 MISTHALIN = "misthalin"
 
+COL_TASKID = "taskid"
+COL_REGION = "region"
+COL_DESCRIPTION = "description"
+COL_POINTS = "points"
+COL_COMPLETION_PCT = "completion_pct"
+COL_USERNAMES = "usernames"
+
+# define arguments
 REGIONS_OPTION = typer.Option(
-    None,
     help="Comma-separated list of regions to include. "
     "Valid values: asgarnia, desert, fremennik, kandarin, morytania, tirannwn, "
     "wilderness, kourend",
 )
+COLUMNS_OPTION = typer.Option(
+    help="Comma-separated list of columns to exclude. "
+    "Valid values: taskid, region, description, points, completion_pct, usernames",
+)
 EXCLUDE_GLOBAL_OPTION = typer.Option(
-    False, help="Exclude general and shared-region tasks from the report"
+    help="Exclude general and shared-region tasks from the results"
 )
 PLAYERS_ARGUMENT = typer.Argument(
-    ...,
     help="Players to report task completion on",
 )
 
-
+# define functions
 def parse_regions(regions_str: str) -> list[str]:
     regions = (
         [r.strip().lower() for r in regions_str.split(",")]
@@ -74,11 +90,46 @@ def parse_regions(regions_str: str) -> list[str]:
     return list(results)
 
 
+def parse_columns(columns_str: str) -> list[str]:
+    columns = (
+        [r.strip().lower() for r in columns_str.split(",")]
+        if columns_str
+        else [
+            COL_TASKID,
+            COL_REGION,
+            COL_DESCRIPTION,
+            COL_POINTS,
+            COL_COMPLETION_PCT,
+            COL_USERNAMES,
+        ]
+    )
+
+    results = set()
+    for col in columns:
+        if col == COL_TASKID:
+            results.add(COL_TASKID)
+        elif col == COL_REGION:
+            results.add(COL_REGION)
+        elif col == COL_DESCRIPTION:
+            results.add(COL_DESCRIPTION)
+        elif col == COL_POINTS:
+            results.add(COL_POINTS)
+        elif col == COL_COMPLETION_PCT:
+            results.add(COL_COMPLETION_PCT)
+        elif col == COL_USERNAMES:
+            results.add(COL_USERNAMES)
+        else:
+            raise ValueError(f"Unknown column: {col}")
+
+    return list(results)
+
 def get_tasks_df(
     regions_str: str,
+    columns_str: str,
     exclude_global: bool,
     players: list[str],
 ):
+    """Get a players tasks and returns a dataframe with the results"""
     if len(players) == 0:
         raise ValueError("Must specify at least one player")
 
@@ -98,47 +149,69 @@ def get_tasks_df(
 
     records = []
     main_player_stats = players_stats[players[0]]
+    
+    selected_columns = parse_columns(columns_str)
+    
+    # Get task info
     for task_id, task in main_player_stats.items():
-        record = {
-            "task_id": task_id,
-            "region": task.region,
-            "description": task.description,
-            "points": task.points,
-            "completion_pct": task.completion_pct,
-        }
+        record = {}
+                
+        if(COL_TASKID in selected_columns):
+            record["task_id"] = task_id
+                        
+        if(COL_REGION in selected_columns):
+            record["region"] = task.region
+                        
+        if(COL_DESCRIPTION in selected_columns):
+            record["description"] = task.description
+                        
+        if(COL_POINTS in selected_columns):
+            record["points"] = task.points
+                        
+        if(COL_COMPLETION_PCT in selected_columns):
+            record["completion_pct"] = task.completion_pct
 
-        for player in players:
-            record[player] = players_stats[player][task_id].player_completed
+        if(COL_USERNAMES in selected_columns):
+            for player in players:
+                record[player] = players_stats[player][task_id].player_completed
 
         records.append(record)
 
     return pd.DataFrame.from_records(records)
 
+# define typer commands
 
-@app.command()
 def tasks(
-    regions: str = REGIONS_OPTION,
-    exclude_global: bool = EXCLUDE_GLOBAL_OPTION,
-    players: list[str] = PLAYERS_ARGUMENT,
+    regions: Annotated[str, REGIONS_OPTION] = None,
+    columns: Annotated[str, COLUMNS_OPTION] = None,
+    exclude_global: Annotated[bool, EXCLUDE_GLOBAL_OPTION] = False,
+    players: Annotated[list[str], PLAYERS_ARGUMENT] = ...,
 ):
+    """
+    List all tasks any of the given players have done
+    """
     if len(players) == 0:
         raise ValueError("Must specify at least one player")
 
-    tasks_df = get_tasks_df(regions, exclude_global, players)
+    tasks_df = get_tasks_df(regions, columns, exclude_global, players)
     tasks_to_report = tasks_df[tasks_df[players].any(axis=1)]
     print(tabulate(tasks_to_report, headers="keys", showindex=False))
 
 
 @app.command()
 def suggest(
-    regions: str = REGIONS_OPTION,
-    exclude_global: bool = EXCLUDE_GLOBAL_OPTION,
-    players: list[str] = PLAYERS_ARGUMENT,
+    regions: Annotated[str, REGIONS_OPTION] = None,
+    columns: Annotated[str, COLUMNS_OPTION] = None,
+    exclude_global: Annotated[bool, EXCLUDE_GLOBAL_OPTION] = False,
+    players: Annotated[list[str], PLAYERS_ARGUMENT] = ...,
 ):
+    """
+    List all tasks you haven't done and that any of your friends have done. Put yourself first in the list.
+    """
     if len(players) < 2:
         raise ValueError("Must specify at least two players")
 
-    tasks_df = get_tasks_df(regions, exclude_global, players)
+    tasks_df = get_tasks_df(regions, columns, exclude_global, players)
     main_player = players[0]
     any_tasks_done = tasks_df[tasks_df[players].any(axis=1)]
     tasks_main_hasnt_done = any_tasks_done[~any_tasks_done[main_player]]
