@@ -6,6 +6,10 @@ from leaguespy.player_stats import get_player_stats
 from leaguespy.player_task_info import PlayerTaskInfo
 
 app = typer.Typer()
+# define typer app
+app = typer.Typer(
+    help="OSRS Leagues Comparison Tool",
+    add_completion=False)
 
 ASGARNIA = "asgarnia"
 DESERT = "desert"
